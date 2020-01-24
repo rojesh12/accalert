@@ -95,4 +95,89 @@ void setup()
   Serial.println(ysample);
   Serial.println(zsample);
   delay(1000);
+  lcd.clear();
+  lcd.print("Waiting For GPS");
+  lcd.setCursor(0,1);
+  lcd.print("     Signal    ");
+  delay(2000);
+  gps.begin(9600);
+  get_gps();
+  show_coordinate();
+  delay(2000);
+  lcd.clear();
+  lcd.print("GPS is Ready");
+  delay(1000);
+  lcd.clear();
+  lcd.print("System Ready");
+  Serial.println("System Ready..");
+}
+
+void loop() 
+{
+    int value1=analogRead(x);
+    int value2=analogRead(y);
+    int value3=analogRead(z);
+
+    int xValue=xsample-value1;
+    int yValue=ysample-value2;
+    int zValue=zsample-value3;
+    
+    Serial.print("x=");
+    Serial.println(xValue);
+    Serial.print("y=");
+    Serial.println(yValue);
+    Serial.print("z=");
+    Serial.println(zValue);
+
+    if(xValue < minVal || xValue > MaxVal  || yValue < minVal || yValue > MaxVal  || zValue < minVal || zValue > MaxVal)
+    {
+      get_gps();
+      show_coordinate();
+      lcd.clear();
+      lcd.print("Sending SMS ");
+      Serial.println("Sending SMS");
+      Send();
+      Serial.println("SMS Sent");
+      delay(2000);
+      lcd.clear();
+      lcd.print("System Ready");
+    }       
+}
+
+void gpsEvent()
+{
+  gpsString="";
+  while(1)
+  {
+   while (gps.available()>0)            //Serial incoming data from GPS
+   {
+    char inChar = (char)gps.read();
+     gpsString+= inChar;                    //store incoming data from GPS to temparary string str[]
+     i++;
+    // Serial.print(inChar);
+     if (i < 7)                      
+     {
+      if(gpsString[i-1] != test[i-1])         //check for right string
+      {
+        i=0;
+        gpsString="";
+      }
+     }
+    if(inChar=='\r')
+    {
+     if(i>60)
+     {
+       gps_status=1;
+       break;
+     }
+     else
+     {
+       i=0;
+     }
+    }
+  }
+   if(gps_status)
+    break;
+  }
+}
   
