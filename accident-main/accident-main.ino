@@ -24,3 +24,28 @@ float logitude=0;
 String Speed="";
 String gpsString="";
 char *test="$GPRMC";
+
+void initModule(String cmd, char *res, int t)
+{
+  while(1)
+  {
+    Serial.println(cmd);
+    Serial1.println(cmd);
+    delay(100);
+    while(Serial1.available()>0)
+    {
+       if(Serial1.find(res))
+       {
+        Serial.println(res);
+        delay(t);
+        return;
+       }
+
+       else
+       {
+        Serial.println("Error");
+       }
+    }
+    delay(t);
+  }
+}
