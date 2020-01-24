@@ -180,4 +180,118 @@ void gpsEvent()
     break;
   }
 }
-  
+void get_gps()
+{
+  lcd.clear();
+  lcd.print("Getting GPS Data");
+  lcd.setCursor(0,1);
+  lcd.print("Please Wait.....");
+   gps_status=0;
+   int x=0;
+   while(gps_status==0)
+   {
+    gpsEvent();
+    int str_lenth=i;
+    coordinate2dec();
+    i=0;x=0;
+    str_lenth=0;
+   }
+}
+
+void show_coordinate()
+{
+    lcd.clear();
+    lcd.print("Lat:");
+    lcd.print(latitude);
+    lcd.setCursor(0,1);
+    lcd.print("Log:");
+    lcd.print(logitude);
+    Serial.print("Latitude:");
+    Serial.println(latitude);
+    Serial.print("Longitude:");
+    Serial.println(logitude);
+    Serial.print("Speed(in knots)=");
+    Serial.println(Speed);
+    delay(2000);
+    lcd.clear();
+    lcd.print("Speed(Knots):");
+    lcd.setCursor(0,1);
+    lcd.print(Speed);
+}
+
+void coordinate2dec()
+{
+  String lat_degree="";
+    for(i=20;i<=21;i++)         
+      lat_degree+=gpsString[i];
+      
+  String lat_minut="";
+     for(i=22;i<=28;i++)         
+      lat_minut+=gpsString[i];
+
+  String log_degree="";
+    for(i=32;i<=34;i++)
+      log_degree+=gpsString[i];
+
+  String log_minut="";
+    for(i=35;i<=41;i++)
+      log_minut+=gpsString[i];
+    
+    Speed="";
+    for(i=45;i<48;i++)          //extract longitude from string
+      Speed+=gpsString[i];
+      
+     float minut= lat_minut.toFloat();
+     minut=minut/60;
+     float degree=lat_degree.toFloat();
+     latitude=degree+minut;
+     
+     minut= log_minut.toFloat();
+     minut=minut/60;
+     degree=log_degree.toFloat();
+     logitude=degree+minut;
+}
+
+void Send()
+{ 
+   Serial1.println("AT");
+   delay(500);
+   serialPrint();
+   Serial1.println("AT+CMGF=1");
+   delay(500);
+   serialPrint();
+   Serial1.print("AT+CMGS=");
+   Serial1.print('"');
+   Serial1.print("9821757249");    //mobile no. for SMS alert
+   Serial1.println('"');
+   delay(500);
+   serialPrint();
+   Serial1.print("Latitude:");
+   Serial1.println(latitude);
+   delay(500);
+   serialPrint();
+   Serial1.print(" longitude:");
+   Serial1.println(logitude);
+   delay(500);
+   serialPrint();
+   Serial1.print(" Speed:");
+   Serial1.print(Speed);
+   Serial1.println("Knots");
+   delay(500);
+   serialPrint();
+   Serial1.print("http://maps.google.com/maps?&z=15&mrt=yp&t=k&q=");
+   Serial1.print(latitude,6);
+   Serial1.print("+");              //28.612953, 77.231545   //28.612953,77.2293563
+   Serial1.print(logitude,6);
+   Serial1.write(26);
+   delay(2000);
+   serialPrint();
+}
+
+void serialPrint()
+{
+  while(Serial1.available()>0)
+  {
+    Serial.print(Serial1.read());
+  }
+}
