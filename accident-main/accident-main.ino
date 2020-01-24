@@ -49,3 +49,50 @@ void initModule(String cmd, char *res, int t)
     delay(t);
   }
 }
+void setup() 
+{
+  Serial1.begin(9600);
+  Serial.begin(9600);
+  lcd.begin(16,2);  
+  lcd.print("Accident Alert!!!  ");
+  lcd.setCursor(0,1);
+  lcd.print("     System     ");
+  delay(2000);
+  lcd.clear();
+  lcd.print("Initializing..........");
+  lcd.setCursor(0,1);
+  lcd.print("Please Wait... we are processing.....");
+  delay(1000);
+  
+  Serial.println("Initializing....");
+  initModule("AT","OK",1000);
+  initModule("ATE1","OK",1000);
+  initModule("AT+CPIN?","READY",1000);  
+  initModule("AT+CMGF=1","OK",1000);     
+  initModule("AT+CNMI=2,2,0,0,0","OK",1000);  
+  Serial.println("Initialized Successfully");
+  lcd.clear();
+  lcd.print("Initialized!!!!");
+  lcd.setCursor(0,1);
+  lcd.print("Successfully.......");
+  delay(2000);
+  lcd.clear();
+  lcd.print("Callibrating........ ");
+  lcd.setCursor(0,1);
+  lcd.print("Acceleromiter!!!");
+  for(int i=0;i<samples;i++)
+  {
+    xsample+=analogRead(x);
+    ysample+=analogRead(y);
+    zsample+=analogRead(z);
+  }
+
+  xsample/=samples;
+  ysample/=samples;
+  zsample/=samples;
+
+  Serial.println(xsample);
+  Serial.println(ysample);
+  Serial.println(zsample);
+  delay(1000);
+  
