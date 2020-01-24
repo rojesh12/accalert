@@ -1,9 +1,26 @@
-void setup() {
-  // put your setup code here, to run once:
+#include<SoftwareSerial.h>
+SoftwareSerial Serial1(2,3); 
+SoftwareSerial gps(10,11);
+#include<LiquidCrystal.h>
+LiquidCrystal lcd(4,5,6,7,8,9);
 
-}
+#define x A1
+#define y A2
+#define z A3
 
-void loop() {
-  // put your main code here, to run repeatedly:
+int xsample=0;
+int ysample=0;
+int zsample=0;
 
-}
+#define samples 10
+
+#define minVal -40
+#define MaxVal 40
+
+int i=0,k=0;
+int  gps_status=0;
+float latitude=0; 
+float logitude=0;                       
+String Speed="";
+String gpsString="";
+char *test="$GPRMC";
